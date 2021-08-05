@@ -51,10 +51,6 @@ func ServerWs(w http.ResponseWriter, r *http.Request) {
 		AcceptedMessages: make(chan[]byte,256),
 	}
 
-
-
-
-
 	if err != nil {
 		log.Print("upgrade:", err)
 		return

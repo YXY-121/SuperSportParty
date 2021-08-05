@@ -11,6 +11,7 @@ type SingleMessage struct {
 	Content string `json:"content"`
 	Type string `json:"type"`
 	AccepterId string `json:"accepter_id"`
+
 }
 
 type Message struct {

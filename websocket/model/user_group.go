@@ -1,8 +1,8 @@
 package model
 
 type UserGroup struct {
-	UserId string
-	GroupId string
+	UserId string 	`gorm:"user_id"`
+	GroupId string `gorm:"group_id"`
 
 }
 

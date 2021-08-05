@@ -2,16 +2,20 @@ package client
 
 import (
 	"apiproject/common"
-	"apiproject/websocket/reponsitory"
+	"apiproject/websocket/model"
+	"apiproject/websocket/repository"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/url"
+	"time"
 )
 
-type ClientService struct {
+var groupHistory=repository.GroupHistoryMessageRepository{}
+var singleHistory=repository.SingleHistoryMessageRepository{}
 
+type ClientService struct {
 	Url url.URL
 	Conn  *websocket.Conn
 	HubMap map[string]*Hub
@@ -38,13 +42,6 @@ func (c *ClientService)ReturnAccectped(){
 
 }
 
-//定义一个有所有群的hubmap总群
-func (c *ClientService)CreateGroup()  {
-	//创建hub
-}
-func  (c *ClientService)AddGroup(GroupId  string)  {
-	//c.HubMap[GroupId]=
-}
 func (c *ClientService)SendOther()  {
 
 	for{
@@ -63,24 +60,24 @@ func (c *ClientService)SendOther()  {
 
 		//初始化client的群频道		//同时让client注册到这个频道里
 		if message.UserId!="" {
-			hubs:=c.GetClientHubMap(message.UserId)
+			c.SenderId=message.UserId
+			hubs:=c.InitClientHubMapAndRegister(message.UserId)
 			c.HubMap=hubs
-
 		}
 
-
 		if (message!=common.Message{})&&message.Type==common.SingleMessageType {
+
 			c.SendSingleMessage(messageData)
 		} else if (message!=common.Message{})&&message.Type==common.GroupMessageType {
 
 			c.SendGroupMessage(messageData)
 		}else {
-			c.comonMessage(messageData)
+			c.SendComonMessage(messageData)
 		}
 
 	}
 }
-func(c *ClientService)comonMessage(messageData[]byte)  {
+func(c *ClientService)SendComonMessage(messageData[]byte)  {
 
 	for _,hub:=range c.HubMap {
 		a:="group"+hub.HubId
@@ -96,13 +93,17 @@ func (c *ClientService)SendGroupMessage(messageData[]byte)  {
 
 
 		message:=common.GroupMessage{}
-
 		json.Unmarshal(messageData,&message)
+		message.SenderId=c.SenderId
+		fmt.Println("此时发送者是",c.SenderId)
+		//记录到历史消息里去
+		c.RecordInGroupHistory(message)
 
 		groupMessage,_:=json.Marshal(message)
 		groupId:=message.GroupId
-		//检查该client是否关注了这个群
 		hub:=c.HubMap[groupId]
+
+	//检查该client是否关注了这个群
 	if hub!=nil {
 		fmt.Println("已发送给hub处理")
 		hub.GroupBroadCast<-groupMessage
@@ -113,32 +114,74 @@ func (c *ClientService)SendGroupMessage(messageData[]byte)  {
 
 
 }
+
 func (c *ClientService)SendSingleMessage(messageData[]byte)  {
+
 	message:=common.SingleMessage{}
+
 	json.Unmarshal(messageData,&message)
 
+	c.RecordInSingleHistory(message)
+
+	//获得message
+	//检查收信息的人是否在线，如果不在就8
+	//或者说加入一个接收历史消息的功能
+	//todo
 }
 
-func (c *ClientService)GetClientHubMap(userId string)map[string]*Hub {
-	groups:=reponsitory.GetGroupsByUserId(userId)
-	fmt.Println(groups)
+//初始化client的hubMap和register到hub里去
+func (c *ClientService)InitClientHubMapAndRegister(userId string)map[string]*Hub {
+	groups:= repository.GetGroupsByUserId(userId)
 	hubMap:=make(map[string]*Hub)
 	for _,v:=range groups{
-		hubMap[v.GroupId]= AllHub[v.GroupId]
-		AllHub[v.GroupId].Clients[c]=true
+		groupId:=v.GroupId
+		hubMap[groupId]= AllHub[groupId]
+		AllHub[groupId].Register<-c
+		//获取每个群的历史信息
+		c.SendGroupHistoryToClient(groupId)
 	}
 
 	return hubMap
 }
-func InitAllGroup()  {
-	groups:=reponsitory.GetAllGroups();
-	for _,group:=range groups {
-		hub:= NewHub(group.GroupId)
-		AllHub[group.GroupId]=hub
-		go hub.Run()
+
+
+func (c *ClientService)RecordInGroupHistory(message common.GroupMessage){
+	historyMessage:=model.GroupHistoryMessage{
+		SenderId: message.SenderId,
+		GroupId: message.GroupId,
+		Content: message.Content,
+		Time: time.Now(),
 	}
-	fmt.Println(len(AllHub))
+	groupHistory.RecordInHistory(&historyMessage)
+
+}
+func (c *ClientService)RecordInSingleHistory(message common.SingleMessage){
+	historyMessage:=model.SingleHistoryMessage{
+		SenderId: message.SenderId,
+		AccepterId: message.AccepterId,
+		Content: message.Content,
+		Time: time.Now(),
+	}
+	singleHistory.RecordInHistory(&historyMessage)
+
 }
 
+func (c *ClientService)SendGroupHistoryToClient(groupId string){
+	groupHistory:=groupHistory.GetHistory(groupId)
+	hub:=AllHub[groupId]
+	if hub!=nil {
+		for _,v:=range groupHistory{
+			historymessage,_:=json.Marshal(v)
+				hub.GroupBroadCast<-historymessage
+		}
+	}
 
 
+}
+
+func (c *ClientService)SendSingleHistoryToClient(userId string){
+	//自己和别人的会话？acctper和sender都是自己
+	singleHistory:=singleHistory.GetHistory(userId)
+	historymessage,_:=json.Marshal(singleHistory)
+	c.AcceptedMessages<-historymessage
+}

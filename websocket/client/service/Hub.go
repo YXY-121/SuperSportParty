@@ -1,5 +1,10 @@
 package client
 
+import (
+	"apiproject/websocket/repository"
+	"fmt"
+)
+
 var AllHub =make(map[string]*Hub)
 
 type Hub struct {
@@ -11,6 +16,18 @@ type Hub struct {
 
 	//map[string]chan[]byte
 }
+//初始化全部的group
+func InitAllGroup()  {
+	groups:=repository.GetAllGroups();
+	for _,group:=range groups {
+		hub:= NewHub(group.GroupId)
+		AllHub[group.GroupId]=hub
+		go hub.Run()
+	}
+	fmt.Println(len(AllHub))
+}
+
+
 
 func NewHub(hubId string) *Hub {
 	return &Hub{

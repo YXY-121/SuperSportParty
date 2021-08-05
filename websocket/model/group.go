@@ -1,7 +1,7 @@
 package model
 
 type Group struct {
-	GroupId string 	 `gorm:grou_id`
+	GroupId string 	 `gorm:"group_id"`
 }
 
 
