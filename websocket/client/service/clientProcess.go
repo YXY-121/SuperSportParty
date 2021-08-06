@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
+	"github.com/satori/go.uuid"
 	"log"
 	"net/url"
 	"time"
@@ -45,7 +46,7 @@ func (c *ClientService)ReturnAccectped(){
 func (c *ClientService)SendOther()  {
 
 	for{
-		_,messageData,err:=c.Conn.ReadMessage()
+		messageType,messageData,err:=c.Conn.ReadMessage()
 		//这个很重要 不然client退出的时候 server会报错
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
@@ -53,7 +54,11 @@ func (c *ClientService)SendOther()  {
 			}
 			break
 		}
-		fmt.Println("进来饿了")
+		//注销
+		if messageType==websocket.CloseMessage {
+			fmt.Println("注销")
+			c.LogOut()
+		}
 
 		message:=common.Message{}
 		messageData1:=messageData
@@ -65,8 +70,6 @@ func (c *ClientService)SendOther()  {
 			//群注册
 			hubs:=c.InitClientHubMapAndRegister(message.UserId)
 			c.HubMap=hubs
-
-			AllUser[c.SenderId]=true
 			AllClient[c.SenderId]=c
 		}
 
@@ -131,7 +134,7 @@ func (c *ClientService)SendSingleMessage(messageData[]byte)  {
 	//todo 发送给好友
 	//获得message
 	//检查收信息的人是否在线，如果不在就88 在就发送给他！
-	if AllUser[message.AccepterId] {
+	if AllClient[message.AccepterId]!=nil{
 		AllClient[message.AccepterId].AcceptedMessages<-messageData
 	}
 
@@ -201,8 +204,22 @@ func (c *ClientService)SendSingleHistoryToClient(userId string){
 }
 
 //创建群聊
-func CreateGroup()  {
-	uuid.Must(uuid.NewV4())
+func (c *ClientService)CreateGroup(createrId string,groupUsers []string,groupName string,)  {
+	groupId:= uuid.NewV4().String()
+	//创建群控制器
+	//hub:=NewHub(groupId)
+	//建群
+	repository.CreateGroup(groupId,groupName,createrId)
 
-	NewHub()
+	//加入群记录
+	repository.AddUsersToGroup(groupUsers,groupId)
+
+	//
+}
+
+func (c *ClientService)LogOut(){
+	AllClient[c.SenderId]=nil
+	for _,hub:=range c.HubMap {
+		hub.Unregister<-c
+	}
 }

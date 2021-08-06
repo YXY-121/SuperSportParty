@@ -16,3 +16,12 @@ func GetAllUsersByGroupId(groupId string)  {
 	common.DB.Model(model.Group{}).Where("group_id=?",groupId)
 
 }
+func CreateGroup(groupId string,groupName string,groupMaster string){
+	group:=model.Group{
+		groupId,
+		groupName,
+		groupMaster,
+	}
+
+	common.DB.Model(&model.Group{}).Create(&group)
+}

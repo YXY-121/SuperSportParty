@@ -15,6 +15,6 @@ func (s *SingleHistoryMessageRepository)RecordInHistory(singleMessage *model.Sin
 
 func (s *SingleHistoryMessageRepository)GetHistory(userId string) []model.SingleHistoryMessage {
 	singleHistory:=make([]model.SingleHistoryMessage,0)
-	common.DB.Model(&model.SingleHistoryMessage{}).Where("sender_id=? or accepter_id=?",userId,userId).Scan(&singleHistory)
+	common.DB.Model(&model.SingleHistoryMessage{}).Where("sender_id=? or accepter_id=?",userId,userId).Order("time desc").Limit(5).Scan(&singleHistory)
 	return singleHistory
 }

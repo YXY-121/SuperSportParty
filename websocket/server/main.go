@@ -170,10 +170,14 @@ console.log( document.getElementById("sendUserId"));
             if (!ws) {
                 return false;
             }
-        var messageObj = {group_id:groupId.value,inputGroup:input.value,type:"group"};
+        var messageObj = {group_id:groupId.value,content:inputGroup.value,type:"group"};
         var messageJson = JSON.stringify(messageObj);
         ws.send(messageJson);
             return false;
+   
+        //var groupId=document.getElementById("groupId");
+        //var inputGroup=document.getElementById("inputGroup");
+        //var sendGroup=document.getElementById("sendGroup");
         };
     
         //发送私人聊天

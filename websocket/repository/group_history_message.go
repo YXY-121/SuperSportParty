@@ -16,6 +16,6 @@ func (s *GroupHistoryMessageRepository)RecordInHistory(groupMessage *model.Group
 }
 func (s *GroupHistoryMessageRepository)GetHistory(groupId string) []model.GroupHistoryMessage {
 	groupHistory:=make([]model.GroupHistoryMessage,0)
-	common.DB.Model(&model.GroupHistoryMessage{}).Where("group_id=?",groupId).Scan(&groupHistory)
+	common.DB.Model(&model.GroupHistoryMessage{}).Where("group_id=?",groupId).Order("time desc").Limit(5).Scan(&groupHistory)
 	return groupHistory
 }
