@@ -23,7 +23,7 @@ func checkOrigin(r *http.Request) bool {
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
-	homeTemplate.Execute(w, "ws://"+r.Host+"/echo")
+	homeTemplate.Execute(w, "ws://"+r.Host+"/ws")
 	fmt.Println("ws://"+r.Host+"/ws")
 }
 
@@ -33,7 +33,7 @@ func WebServer() {
 
 	client.InitAllGroup()
 
-	http.HandleFunc("/echo", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		ServerWs( w, r)
 	})
 	http.HandleFunc("/", home)
@@ -73,96 +73,144 @@ var homeTemplate = template.Must(template.New("").Parse(`
 <html>
 <head>
 <meta charset="utf-8">
-<script>  
-window.addEventListener("load", function(evt) {
-    var output = document.getElementById("output");
-    var input = document.getElementById("input");
-	var inputG = document.getElementById("inputGroup");
-	var inputType=document.getElementById("inputType");
-	var inputUserId=document.getElementById("inputUserId");
 
-    var ws;
-    var print = function(message) {
-        var d = document.createElement("div");
-        d.innerHTML = message;
-        output.appendChild(d);
-    };
-    document.getElementById("open").onclick = function(evt) {
-        if (ws) {
-            return false;
-        }
-        ws = new WebSocket("{{.}}");
-        ws.onopen = function(evt) {
-            print("OPEN");
-        }
-        ws.onclose = function(evt) {
-            print("CLOSE");
-            ws = null;
-        }
-        ws.onmessage = function(evt) {
-            print("RESPONSE: " + evt.data);
-        }
-        ws.onerror = function(evt) {
-            print("ERROR: " + evt.data);
-        }
-        return false;
-    };
-    document.getElementById("send").onclick = function(evt) {
-        if (!ws) {
-            return false;
-        }
-	var messageObj = {group_id:inputG.value,content:input.value,type:inputType.value};
-	var messageJson = JSON.stringify(messageObj);
-	ws.send(messageJson);
-        return false;
-    };
-    document.getElementById("sendUserID").onclick = function(evt) {
-       if (!ws) {
-           return false;
-       }
-	var messageObj = {user_id:inputUserId.value};
-	var messageJson = JSON.stringify(messageObj);
-	ws.send(messageJson);
-       return false;
-    };
-
-    document.getElementById("close").onclick = function(evt) {
-        if (!ws) {
-            return false;
-        }
-        ws.close();
-        return false;
-    };
-});
-</script>
 </head>
 <body>
 <table>
 <tr><td valign="top" width="50%">
+这里是群聊~
+<form>
+<!-- 1 -->
+<input id="inputGroup" type="text" value="Hello world!">
+<input id="groupId" type="text" value="输入组名!">
+
+<button id="sendGroup">SendGroup</button>
+</form>
+
+
+这里是私人聊~
+<form>
+<!-- 2 -->
+<input id="inputSingle" type="text" value="Hello world!">
+<input id="singleId" type="text" value="输入要发送的朋友Id!">
+<button id="sendSingle">SendSingle</button>
+</form>
+
+
+点击open时，第一次发送信息前要输入userId（模拟登录）
+
+
 
 <form>
+<!-- 3-->
+<input id="inputUserId" type="text" value="输入userId">
+<button id="sendUserId">sendUserID</button>
+</form>
 <button id="open">Open</button>
 <button id="close">Close</button>
-<input id="input" type="text" value="Hello world!">
-<input id="inputGroup" type="text" value="输入组名!">
-<input id="inputType" type="text" value="输入类型">
-
-
-<button id="send">Send</button>
-
-</form>
-<form>
-<input id="inputUserId" type="text" value="输入userId">
-<button id="sendUserID">sendUserID</button>
-
-</form>
-
 
 </td><td valign="top" width="50%">
 <div id="output"></div>
 </td></tr></table>
+<script>  
+console.log( document.getElementById("sendUserId"));
+ 
+  onclick =()=>{
+      console.log(111112111);
+  }
+    window.addEventListener("load", function(evt) {
+        var output = document.getElementById("output");
+        var input = document.getElementById("input");
+    
+    
+        var inputUserId=document.getElementById("inputUserId");
+        var sendUserID=document.getElementById("sendUserId");
+    
+    
+        var singleId=document.getElementById("singleId");
+        var inputSingle=document.getElementById("inputSingle");
+        var sendSingle=document.getElementById("sendSingle");
+    
+        
+        var groupId=document.getElementById("groupId");
+        var inputGroup=document.getElementById("inputGroup");
+        var sendGroup=document.getElementById("sendGroup");
+    
+    
+    
+     
+        var ws;
+        var print = function(message) {
+            var d = document.createElement("div");
+            d.innerHTML = message;
+            output.appendChild(d);
+        };
+        document.getElementById("open").onclick = function(evt) {
+            if (ws) {
+                return false;
+            }
+            ws = new WebSocket("{{.}}");
+            ws.onopen = function(evt) {
+                print("OPEN");
+            }
+            ws.onclose = function(evt) {
+                print("CLOSE");
+                ws = null;
+            }
+            ws.onmessage = function(evt) {
+                print("RESPONSE: " + evt.data);
+            }
+            ws.onerror = function(evt) {
+                print("ERROR: " + evt.data);
+            }
+            return false;
+        };
+        //发送群聊
+        document.getElementById("sendGroup").onclick = function(evt) {
+            if (!ws) {
+                return false;
+            }
+        var messageObj = {group_id:groupId.value,inputGroup:input.value,type:"group"};
+        var messageJson = JSON.stringify(messageObj);
+        ws.send(messageJson);
+            return false;
+        };
+    
+        //发送私人聊天
+        document.getElementById("sendSingle").onclick = function(evt) {
+            if (!ws) {
+                return false;
+            }
+        var messageObj = {accepter_id:singleId.value,content:inputSingle.value,type:"single"};
+        var messageJson = JSON.stringify(messageObj);
+        ws.send(messageJson);
+            return false;
+        };
+    
+        // 模拟登录 发送userid
+        document.getElementById("sendUserId").onclick = function(evt) {
+           if (!ws) {
+               return false;
+           }
+        var messageObj = {user_id:inputUserId.value};
+        var messageJson = JSON.stringify(messageObj);
+        ws.send(messageJson);
+           return false;
+        };
+    
+        document.getElementById("close").onclick = function(evt) {
+            if (!ws) {
+                return false;
+            }
+            ws.close();
+            return false;
+        };
+    });
+    </script>
 </body>
 </html>
+
+
 `))
 
 /*var upgrader =websocket.Upgrader{

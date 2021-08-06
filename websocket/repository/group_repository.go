@@ -11,3 +11,8 @@ func GetAllGroups() []model.Group {
 	common.DB.Model(model.Group{}).Scan(&group)
 	return  group
 }
+func GetAllUsersByGroupId(groupId string)  {
+
+	common.DB.Model(model.Group{}).Where("group_id=?",groupId)
+
+}

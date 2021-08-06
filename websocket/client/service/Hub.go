@@ -6,6 +6,8 @@ import (
 )
 
 var AllHub =make(map[string]*Hub)
+var AllUser=make(map[string]bool)
+var AllClient =make(map[string]*ClientService)
 
 type Hub struct {
 	HubId string

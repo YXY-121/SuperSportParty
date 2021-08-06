@@ -5,7 +5,6 @@ import "time"
 type SingleHistoryMessage struct {
 	SenderId string `gorm:"sender_id"`
 	Content string `gorm:"content"`
-	Type string `gorm:"type"`
 	AccepterId string `gorm:"accepter_id"`
 	Time time.Time `gorm:"time"`
 }

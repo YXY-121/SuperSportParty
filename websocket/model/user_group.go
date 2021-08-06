@@ -9,3 +9,4 @@ type UserGroup struct {
 func  (UserGroup)TableName() string {
 	return "user_group"
 }
+

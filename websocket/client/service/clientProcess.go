@@ -53,6 +53,7 @@ func (c *ClientService)SendOther()  {
 			}
 			break
 		}
+		fmt.Println("进来饿了")
 
 		message:=common.Message{}
 		messageData1:=messageData
@@ -61,8 +62,12 @@ func (c *ClientService)SendOther()  {
 		//初始化client的群频道		//同时让client注册到这个频道里
 		if message.UserId!="" {
 			c.SenderId=message.UserId
+			//群注册
 			hubs:=c.InitClientHubMapAndRegister(message.UserId)
 			c.HubMap=hubs
+
+			AllUser[c.SenderId]=true
+			AllClient[c.SenderId]=c
 		}
 
 		if (message!=common.Message{})&&message.Type==common.SingleMessageType {
@@ -122,9 +127,14 @@ func (c *ClientService)SendSingleMessage(messageData[]byte)  {
 	json.Unmarshal(messageData,&message)
 
 	c.RecordInSingleHistory(message)
-
+	fmt.Println("私人信息",message)
+	//todo 发送给好友
 	//获得message
-	//检查收信息的人是否在线，如果不在就8
+	//检查收信息的人是否在线，如果不在就88 在就发送给他！
+	if AllUser[message.AccepterId] {
+		AllClient[message.AccepterId].AcceptedMessages<-messageData
+	}
+
 	//或者说加入一个接收历史消息的功能
 	//todo
 }
@@ -139,6 +149,7 @@ func (c *ClientService)InitClientHubMapAndRegister(userId string)map[string]*Hub
 		AllHub[groupId].Register<-c
 		//获取每个群的历史信息
 		c.SendGroupHistoryToClient(groupId)
+		c.SendSingleHistoryToClient(c.SenderId)
 	}
 
 	return hubMap
@@ -157,7 +168,7 @@ func (c *ClientService)RecordInGroupHistory(message common.GroupMessage){
 }
 func (c *ClientService)RecordInSingleHistory(message common.SingleMessage){
 	historyMessage:=model.SingleHistoryMessage{
-		SenderId: message.SenderId,
+		SenderId: c.SenderId,
 		AccepterId: message.AccepterId,
 		Content: message.Content,
 		Time: time.Now(),
@@ -182,6 +193,16 @@ func (c *ClientService)SendGroupHistoryToClient(groupId string){
 func (c *ClientService)SendSingleHistoryToClient(userId string){
 	//自己和别人的会话？acctper和sender都是自己
 	singleHistory:=singleHistory.GetHistory(userId)
-	historymessage,_:=json.Marshal(singleHistory)
-	c.AcceptedMessages<-historymessage
+	for _,historymessage:=range  singleHistory{
+		historymessageByte,_:=json.Marshal(historymessage)
+		c.AcceptedMessages<-historymessageByte
+
+	}
+}
+
+//创建群聊
+func CreateGroup()  {
+	uuid.Must(uuid.NewV4())
+
+	NewHub()
 }
