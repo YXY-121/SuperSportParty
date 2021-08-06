@@ -3,7 +3,12 @@ package repository
 import (
 	"apiproject/common"
 	"apiproject/websocket/model"
+	"fmt"
 )
+
+type UserGroupRepository struct {
+
+}
 
 func GetGroupsByUserId(userId string) []model.UserGroup {
 	group:=make([]model.UserGroup,0)
@@ -19,5 +24,6 @@ func AddUsersToGroup(groupUsers []string,groupId string){
 		temp.UserId=v
 		group=append(group, temp)
 	}
-	common.DB.Model(&model.Group{}).Create(group)
+	common.DB.Model(&model.UserGroup{}).Create(&group)
+	fmt.Println("创群",groupId)
 }

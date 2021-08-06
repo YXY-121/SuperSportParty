@@ -23,5 +23,5 @@ func CreateGroup(groupId string,groupName string,groupMaster string){
 		groupMaster,
 	}
 
-	common.DB.Model(&model.Group{}).Create(&group)
+	 common.DB.Model(&model.Group{}).Create(&group)
 }

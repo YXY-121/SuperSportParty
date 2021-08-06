@@ -64,13 +64,18 @@ func (c *ClientService)SendOther()  {
 		messageData1:=messageData
 		json.Unmarshal(messageData1,&message)
 
-		//初始化client的群频道		//同时让client注册到这个频道里
+		//初始化client的群频道		//同时让client注册到这个频道里 模拟初次登录
 		if message.UserId!="" {
 			c.SenderId=message.UserId
 			//群注册
 			hubs:=c.InitClientHubMapAndRegister(message.UserId)
 			c.HubMap=hubs
 			AllClient[c.SenderId]=c
+		}
+
+		//创群
+		if message.Type==common.CreateGroupType{
+			c.SendCreateGroupMessage(messageData)
 		}
 
 		if (message!=common.Message{})&&message.Type==common.SingleMessageType {
@@ -131,15 +136,14 @@ func (c *ClientService)SendSingleMessage(messageData[]byte)  {
 
 	c.RecordInSingleHistory(message)
 	fmt.Println("私人信息",message)
-	//todo 发送给好友
-	//获得message
+
+
 	//检查收信息的人是否在线，如果不在就88 在就发送给他！
 	if AllClient[message.AccepterId]!=nil{
 		AllClient[message.AccepterId].AcceptedMessages<-messageData
 	}
 
-	//或者说加入一个接收历史消息的功能
-	//todo
+
 }
 
 //初始化client的hubMap和register到hub里去
@@ -203,20 +207,33 @@ func (c *ClientService)SendSingleHistoryToClient(userId string){
 	}
 }
 
+func (c *ClientService)SendCreateGroupMessage(messageData[]byte) {
+	createGroup:=common.CreateGroupMessage{}
+	json.Unmarshal(messageData,&createGroup)
+	c.CreateGroup(c.SenderId,createGroup.UserIds,createGroup.GroupName)
+}
 //创建群聊
 func (c *ClientService)CreateGroup(createrId string,groupUsers []string,groupName string,)  {
 	groupId:= uuid.NewV4().String()
-	//创建群控制器
-	//hub:=NewHub(groupId)
+	//common.DB.Begin()如何保证一致性的回滚
 	//建群
 	repository.CreateGroup(groupId,groupName,createrId)
+
 
 	//加入群记录
 	repository.AddUsersToGroup(groupUsers,groupId)
 
-	//
+	///创建群控制器
+	hub:=NewHub(groupId)
+	go hub.Run()
+	hub.CreateGroupInit(groupId,groupUsers)
+	//在总观这里注册
+	AllHub[groupId]=hub
+///	common.DB.Commit()
+
 }
 
+//todo 注销 还没写好
 func (c *ClientService)LogOut(){
 	AllClient[c.SenderId]=nil
 	for _,hub:=range c.HubMap {

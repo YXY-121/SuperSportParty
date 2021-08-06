@@ -63,7 +63,17 @@ func (h *Hub)Run(){
 
 	}
 }
-func (h *Hub)CreateGroupInit() {
+func (h *Hub)CreateGroupInit(groupId string,groupUsers []string) {
 	//将在线的给拉群里 不在线的话，到时候上线就会自动进群
+	for _,user:=range groupUsers {
+		client:=AllClient[user]
+		if client!=nil {
+			client.HubMap[groupId]=h
+			h.Register<-client
+			fmt.Println(client.SenderId,"的群数量：",len(client.HubMap))
+
+		}
+
+	}
 
 }

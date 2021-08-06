@@ -86,7 +86,8 @@ var homeTemplate = template.Must(template.New("").Parse(`
 
 <button id="sendGroup">SendGroup</button>
 </form>
-
+<br>
+<br>
 
 这里是私人聊~
 <form>
@@ -95,19 +96,27 @@ var homeTemplate = template.Must(template.New("").Parse(`
 <input id="singleId" type="text" value="输入要发送的朋友Id!">
 <button id="sendSingle">SendSingle</button>
 </form>
+<br>
+<br>
 
-
+创建新群~,好友id之间用,来分隔
+<form>
+<input id="inputCreateGroup" type="text" value="新建群名">
+<input id="CreateGroupUserIds" type="text" value="输入拉入群的好友id">
+<button id="sendCreateGroup">CreateGroup</button>
+</form>
+<br>
+<br>
 点击open时，第一次发送信息前要输入userId（模拟登录）
 
-
-
 <form>
-<!-- 3-->
 <input id="inputUserId" type="text" value="输入userId">
 <button id="sendUserId">sendUserID</button>
 </form>
 <button id="open">Open</button>
 <button id="close">Close</button>
+<br>
+<br>
 
 </td><td valign="top" width="50%">
 <div id="output"></div>
@@ -137,7 +146,9 @@ console.log( document.getElementById("sendUserId"));
         var sendGroup=document.getElementById("sendGroup");
     
     
-    
+     	 var inputCreateGroup=document.getElementById("inputCreateGroup");
+        var CreateGroupUserIds=document.getElementById("CreateGroupUserIds");
+        var sendCreateGroup=document.getElementById("sendCreateGroup");
      
         var ws;
         var print = function(message) {
@@ -190,6 +201,18 @@ console.log( document.getElementById("sendUserId"));
         ws.send(messageJson);
             return false;
         };
+    //创建新群
+           document.getElementById("sendCreateGroup").onclick = function(evt) {
+            if (!ws) {
+                return false;
+            }
+        var user_idsData =CreateGroupUserIds.value.split(",")
+        var messageObj = {group_name:inputCreateGroup.value,user_ids:user_idsData,type:"createGroup"};
+        var messageJson = JSON.stringify(messageObj);
+        ws.send(messageJson);
+            return false;
+        };
+    
     
         // 模拟登录 发送userid
         document.getElementById("sendUserId").onclick = function(evt) {
