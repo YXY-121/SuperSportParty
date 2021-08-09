@@ -215,13 +215,24 @@ func (c *ClientService)SendCreateGroupMessage(messageData[]byte) {
 //创建群聊
 func (c *ClientService)CreateGroup(createrId string,groupUsers []string,groupName string,)  {
 	groupId:= uuid.NewV4().String()
-	//common.DB.Begin()如何保证一致性的回滚
+	tx:=common.WebsocketDB.Begin()
 	//建群
-	repository.CreateGroup(groupId,groupName,createrId)
+	err:=repository.CreateGroup(tx,groupId,groupName,createrId)
+	if err!=nil {
+		fmt.Errorf(err.Error())
 
+		tx.Rollback()
+		return
+	}
 
 	//加入群记录
-	repository.AddUsersToGroup(groupUsers,groupId)
+	err=repository.AddUsersToGroup(tx,groupUsers,groupId)
+	if err!=nil {
+		fmt.Errorf(err.Error())
+		tx.Rollback()
+		return
+	}
+	tx.Commit()
 
 	///创建群控制器
 	hub:=NewHub(groupId)
@@ -229,7 +240,6 @@ func (c *ClientService)CreateGroup(createrId string,groupUsers []string,groupNam
 	hub.CreateGroupInit(groupId,groupUsers)
 	//在总观这里注册
 	AllHub[groupId]=hub
-///	common.DB.Commit()
 
 }
 

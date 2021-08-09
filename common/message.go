@@ -27,6 +27,12 @@ type CreateGroupMessage struct {
 	CreaterId string `json:"creater_id"`
 }
 
+type RedPaper struct {
+	paperId string
+	SenderId string
+	Money string
+	Type string
+}
 const GroupMessageType = "group"
 const SingleMessageType = "single"
 const CreateGroupType ="createGroup"

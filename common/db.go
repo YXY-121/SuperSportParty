@@ -6,11 +6,14 @@ import (
 	"log"
 )
 
-var DB *gorm.DB
+var WebsocketDB *gorm.DB
+var HongbaoDB *gorm.DB
 func init()  {
-		dsn := "root:123@tcp(127.0.0.1:3306)/chat?charset=utf8mb4&parseTime=True&loc=Local"
+		dsn1 := "root:123@tcp(127.0.0.1:3306)/chat?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn2 := "root:123@tcp(127.0.0.1:3306)/hongbao?charset=utf8mb4&parseTime=True&loc=Local"
 		var err error
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	WebsocketDB, err = gorm.Open(mysql.Open(dsn1), &gorm.Config{})
+	HongbaoDB,err=gorm.Open(mysql.Open(dsn2), &gorm.Config{})
 	if err!=nil {
 		log.Println(err)
 	}

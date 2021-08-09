@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var addr = flag.String("addr", ":8081", "http service address")
+var addr = flag.String("addr", ":8083", "http service address")
 var upgrader = websocket.Upgrader{
 	ReadBufferSize: 1024,
 	WriteBufferSize: 1024,

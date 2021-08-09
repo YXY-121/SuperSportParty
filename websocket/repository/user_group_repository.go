@@ -4,6 +4,7 @@ import (
 	"apiproject/common"
 	"apiproject/websocket/model"
 	"fmt"
+	"gorm.io/gorm"
 )
 
 type UserGroupRepository struct {
@@ -13,10 +14,10 @@ type UserGroupRepository struct {
 func GetGroupsByUserId(userId string) []model.UserGroup {
 	group:=make([]model.UserGroup,0)
 
-	common.DB.Model(model.UserGroup{}).Where("user_id=?",userId).Scan(&group)
+	common.WebsocketDB.Model(model.UserGroup{}).Where("user_id=?",userId).Scan(&group)
 	return  group
 }
-func AddUsersToGroup(groupUsers []string,groupId string){
+func AddUsersToGroup(tx *gorm.DB,groupUsers []string,groupId string)error{
 	group:=make([]model.UserGroup,0)
 	for _,v:=range groupUsers{
 		temp:=model.UserGroup{}
@@ -24,6 +25,8 @@ func AddUsersToGroup(groupUsers []string,groupId string){
 		temp.UserId=v
 		group=append(group, temp)
 	}
-	common.DB.Model(&model.UserGroup{}).Create(&group)
 	fmt.Println("创群",groupId)
+
+	return tx.Model(&model.Group{}).Create(&group).Error
+
 }
