@@ -46,6 +46,7 @@ func (c *ClientService)ReturnAccectped(){
 func (c *ClientService)SendOther()  {
 
 	for{
+
 		messageType,messageData,err:=c.Conn.ReadMessage()
 		//这个很重要 不然client退出的时候 server会报错
 		if err != nil {

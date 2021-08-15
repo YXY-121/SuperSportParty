@@ -12,5 +12,7 @@ func main() {
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
 
+
 	webSocketServer.WebServer()
+
 }

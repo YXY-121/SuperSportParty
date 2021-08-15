@@ -14,6 +14,8 @@ type Envelope struct {
 	TotalMoney decimal.Decimal `gorm:"total_money"`
 	RestMoney decimal.Decimal `gorm:"rest_money"`
 	Number int `gorm:"number"`
+	RestNumber int `gorm:"rest_number"`
+	Type string
 	ExpiredTime time.Time `gorm:"expired_time"`
 	CreateTime time.Time `gorm:"create_time"`
 	UpdateTime time.Time `gorm:"update_time"`
