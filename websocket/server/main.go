@@ -46,6 +46,8 @@ func ServerWs(w http.ResponseWriter, r *http.Request) {
 	//每次都创建一个client
 
 	conn, err := upgrader.Upgrade(w, r, nil)
+	fmt.Println("来了")
+
 	client:=&client.ClientService{
 		Conn: conn,
 		AcceptedMessages: make(chan[]byte,256),

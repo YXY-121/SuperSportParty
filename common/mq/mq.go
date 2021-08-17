@@ -22,7 +22,7 @@ func NewDemoListener() *DemoListener {
 		localTrans: new(sync.Map),
 	}
 }
-
+//执行本地事务
 func (dl *DemoListener) ExecuteLocalTransaction(msg *primitive.Message) primitive.LocalTransactionState {
 	nextIndex := atomic.AddInt32(&dl.transactionIndex, 1)
 	fmt.Printf("nextIndex: %v for transactionID: %v\n", nextIndex, msg.TransactionId)
@@ -35,7 +35,7 @@ func (dl *DemoListener) ExecuteLocalTransaction(msg *primitive.Message) primitiv
 	// 如果返回  primitive.CommitMessageState 和primitive.RollbackMessageState 则不会调用CheckLocalTransaction
 	return primitive.UnknowState
 }
-
+//检查本地事务是否执行
 func (dl *DemoListener) CheckLocalTransaction(msg *primitive.MessageExt) primitive.LocalTransactionState {
 	fmt.Printf("%v msg transactionID : %v\n", time.Now(), msg.TransactionId)
 	v, existed := dl.localTrans.Load(msg.TransactionId)
@@ -63,7 +63,7 @@ func (dl *DemoListener) CheckLocalTransaction(msg *primitive.MessageExt) primiti
 func main() {
 	p, _ := rocketmq.NewTransactionProducer(
 		NewDemoListener(),
-		producer.WithNsResolver(primitive.NewPassthroughResolver([]string{"127.0.0.1:9876"})),
+		producer.WithNsResolver(primitive.NewPassthroughResolver([]string{"192.168.10.17:9876"})),
 		producer.WithRetry(1),
 	)
 	err := p.Start()
