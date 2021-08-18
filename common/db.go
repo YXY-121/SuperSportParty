@@ -17,9 +17,9 @@ func init()  {
 	initRedis()
 }
 func initDB (){
-	dsn1 := "root:123@tcp(127.0.0.1:3306)/chat?charset=utf8mb4&parseTime=True&loc=Local"
-	dsn2 := "root:123@tcp(127.0.0.1:3306)/hongbao?charset=utf8mb4&parseTime=True&loc=Local"
-	dsn3:="root:123@tcp(127.0.0.1:3306)/supersport?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn1 := "root:123@tcp(127.0.0.1:3306)/chat?charset=utf8&parseTime=True&loc=Local"
+	dsn2 := "root:123@tcp(127.0.0.1:3306)/hongbao?charset=utf8&parseTime=True&loc=Local"
+	dsn3:="root:123@tcp(127.0.0.1:3306)/supersport?charset=utf8&parseTime=True&loc=Local"
 	var err error
 	SportDB,err=gorm.Open(mysql.Open(dsn3), &gorm.Config{})
 	WebsocketDB, err = gorm.Open(mysql.Open(dsn1), &gorm.Config{})

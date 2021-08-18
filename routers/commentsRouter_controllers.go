@@ -6,6 +6,40 @@ import (
 )
 
 func init() {
+    beego.GlobalControllerRouter["apiproject/controllers:OrderController"] = append(beego.GlobalControllerRouter["apiproject/controllers:OrderController"],
+        beego.ControllerComments{
+            Method: "GrabOrder",
+            Router: "/grabOrder",
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+    beego.GlobalControllerRouter["apiproject/controllers:OrderController"] = append(beego.GlobalControllerRouter["apiproject/controllers:OrderController"],
+        beego.ControllerComments{
+            Method: "CreateOrder",
+            Router: "/createOrder",
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["apiproject/controllers:OrderController"] = append(beego.GlobalControllerRouter["apiproject/controllers:OrderController"],
+        beego.ControllerComments{
+            Method: "GetOrdersByLoacation",
+            Router: "/getOrderByLocation",
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["apiproject/controllers:OrderController"] = append(beego.GlobalControllerRouter["apiproject/controllers:OrderController"],
+        beego.ControllerComments{
+            Method: "GetOrderById",
+            Router: "/getOrderById",
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
     beego.GlobalControllerRouter["apiproject/controllers:ClientController"] = append(beego.GlobalControllerRouter["apiproject/controllers:ClientController"],
         beego.ControllerComments{
             Method: "Post",

@@ -15,5 +15,5 @@ func (u*UserOrderRepository)CreateUserOrderRecord(userId,orderId string)  {
 		OrderId: orderId,
 		UserId: userId,
 	}
-	common.SportDB.Model(&model.UserOrder{}).Save(order)
+	common.SportDB.Model(&model.UserOrder{}).Create(&order)
 }

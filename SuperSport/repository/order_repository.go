@@ -3,34 +3,52 @@ package repository
 import (
 	"apiproject/SuperSport/model"
 	"apiproject/common"
-	"gorm.io/gorm"
+	"fmt"
 )
 
 type OrderRepository struct {
+}
+func NewOrderRepository() *OrderRepository{
+	return &OrderRepository{}
+}
+//根据位置获取订单大概详情？ 不用把所有的值都返回回去
+func (o *OrderRepository)GetOrdersByLocation(location string) []model.Order {
+	orders:=make([]model.Order,0)
+	//order:=model.Order{}
 
+	common.SportDB.Model(&model.Order{}).Where("order_location=?",location).Scan(&orders)
+	return orders
+}
+//获取单个订单的信息
+func (o *OrderRepository)GetOrderByOrderId(orderId string) model.Order {
+	order:=model.Order{}
+	common.SportDB.Model(&model.Order{}).Where("order_id=?",orderId).Scan(&order)
+	return order
 
 }
-func (o *OrderRepository)GetOrderByLocation()  {
-
+//创建订单
+func (o *OrderRepository)CreateOrder(order model.Order)  {
+		common.SportDB.Model(&model.Order{}).Create(&order)
 }
-func (o *OrderRepository)AddOrder(order model.Order)  {
-		common.SportDB.Model(&model.Order{}).Save(order)
 
-}
+
 func (o *OrderRepository)DelOrderPeopleNumber(orderId string,num int)  {
 	//先查询是否>0，不然就88
 	order:=model.Order{}
 	//如果==1，说明满人了就拉人进群里
+	fmt.Println(11)
+
 	common.SportDB.Model(&model.Order{}).Scan(&order).Where("order_id=?",orderId)
-	if (order!=model.Order{}){
+	fmt.Println(order)
+
 		if order.RestNumber==0 {
 			return
 		}
 		if order.RestNumber==1{
 			//满了,准备拉群
 		}
-		common.SportDB.Model(&model.Order{}).Update("people_number",gorm.Expr("people_number-?",num)).Where("order_id=?",orderId)
+		common.SportDB.Model(&model.Order{}).Where("order_id=?",orderId).Update("total_number",order.RestNumber-1)
 
-	}
+
 
 }

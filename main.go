@@ -2,7 +2,6 @@ package main
 
 import (
 	_ "apiproject/routers"
-	webSocketServer "apiproject/websocket/server"
 	beego "github.com/beego/beego/v2/server/web"
 )
 
@@ -12,7 +11,8 @@ func main() {
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
 
+	beego.Run()
 
-	webSocketServer.WebServer()
+	//webSocketServer.WebServer()
 
 }
