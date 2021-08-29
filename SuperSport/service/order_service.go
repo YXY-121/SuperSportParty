@@ -5,9 +5,15 @@ import (
 	"apiproject/SuperSport/repository"
 	"apiproject/common"
 	"context"
+	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"github.com/gomodule/redigo/redis"
 	uuid "github.com/satori/go.uuid"
+	"math"
+	"math/big"
+
+
 	"time"
 )
 
@@ -30,6 +36,24 @@ func (o*OrderService)GetOrderByLocation (location string) []model.Order{
 func (o*OrderService)GetOrderByLocationAndSport(lat1,lng1 float64,sportType string)  {
 
 }
+// 生成区间[-m, n]的安全随机数
+func RangeRand(min, max int64) int64 {
+	if min > max {
+		panic("the min is greater than max!")
+	}
+
+	if min < 0 {
+		f64Min := math.Abs(float64(min))
+		i64Min := int64(f64Min)
+		result,_ := rand.Int(rand.Reader, big.NewInt(max+1+i64Min))
+
+		return result.Int64() - i64Min
+	} else {
+		result, _ := rand.Int(rand.Reader, big.NewInt(max-min+1))
+		return min + result.Int64()
+	}
+}
+
 //创建拼单
 func (o*OrderService)CreateOrder(createrId string,orderLocation string,sportType string,description string,peopleNumber int,longitude,latitude string ,endTime time.Time)  {
 
@@ -51,8 +75,10 @@ func (o*OrderService)CreateOrder(createrId string,orderLocation string,sportType
 	}
 	//写入数据库
 	o.orderRepository.CreateOrder(order)
-
+	biteOrder,_:=json.Marshal(order)
 	//并将order信息存到redis里去,防止死锁
+	fmt.Println("存redis了嘛")
+	common.RedisDB.Do("set",orderId+"Item",biteOrder,"EX",RangeRand(60,1000));
 
 	/*reply,_:=common.RedisDB.Do("set",orderId,1,"ex",10,"nx")
 	if(reply==nil){
@@ -69,6 +95,7 @@ then
 else
 	return 0
 end`
+	//一定要写end 不然就不会实现T.T
 	const 	test=`
 local a= tostring(ARGV[1])
 if redis.call("get",KEYS[1])==a
