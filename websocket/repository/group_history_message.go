@@ -2,20 +2,20 @@ package repository
 
 import (
 	"apiproject/common"
-	"apiproject/websocket/model"
+	"apiproject/model"
 )
 
 type GroupHistoryMessageRepository struct {
-
 }
 
-
-func (s *GroupHistoryMessageRepository)RecordInHistory(groupMessage *model.GroupHistoryMessage)  {
-
+// 插入群组消息
+func RecordGroupInHistory(groupMessage *model.GroupHistoryMessage) {
 	common.WebsocketDB.Model(&model.GroupHistoryMessage{}).Create(&groupMessage)
 }
-func (s *GroupHistoryMessageRepository)GetHistory(groupId string) []model.GroupHistoryMessage {
-	groupHistory:=make([]model.GroupHistoryMessage,0)
-	common.WebsocketDB.Model(&model.GroupHistoryMessage{}).Where("group_id=?",groupId).Order("time desc").Limit(5).Scan(&groupHistory)
+
+// 根据群id查询5条最新的历史消息
+func GetGroupHistory(groupId string) []model.GroupHistoryMessage {
+	groupHistory := make([]model.GroupHistoryMessage, 0)
+	common.WebsocketDB.Model(&model.GroupHistoryMessage{}).Where("group_id=?", groupId).Order("time desc").Limit(5).Scan(&groupHistory)
 	return groupHistory
 }
