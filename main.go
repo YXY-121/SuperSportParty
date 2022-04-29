@@ -3,7 +3,9 @@ package main
 import (
 	"apiproject/common"
 	"apiproject/config"
+	"apiproject/log"
 	"apiproject/routers"
+	service "apiproject/service/websocket"
 
 	"github.com/sirupsen/logrus"
 )
@@ -21,7 +23,9 @@ func main() {
 	//初始化配置
 	config.ConfigSetup()
 	common.InitDB()
-
+	log.SetupLog()
+	//初始化群
+	service.InitAllGroup()
 	// //初始化路由
 	err := routers.InitRouter().Run()
 	if err != nil {

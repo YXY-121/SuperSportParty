@@ -2,7 +2,7 @@
 Host ="127.0.0.1:3306"
 Type ="mysql"
 User ="root"
-Pwd ="123456"
+Pwd ="835264630Yy@"
 Name ="sport"
 
 [Server]
@@ -14,6 +14,7 @@ TokenExpireTime=30
 TokenSecretKey="47d48038-5c85-468a-b17c-ba06bf669c39"
 [Log]
 LogPath ="/var/log"
+LogFile="supersport.log"
 Level="debug"
 
 [Redis]

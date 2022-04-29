@@ -24,8 +24,9 @@ func InitDB() {
 	var err error
 	SportDB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	SportDB.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").AutoMigrate(&model.Order{}, &model.Sport{}, &model.User{},
-		&model.UserOrder{}, &model.UserAppraisal{},
-		&model.Group{}, &model.GroupHistoryMessage{}, &model.SingleHistoryMessage{}, &model.UserGroup{})
+		&model.UserOrder{},
+		&model.Group{}, &model.GroupHistoryMessage{}, &model.SingleHistoryMessage{}, &model.UserGroup{}, &model.Review{}, &model.UserFriend{},
+		&model.Evaluation{}, &model.Admin{})
 	WebsocketDB = SportDB
 	//	WebsocketDB, err = gorm.Open(mysql.Open(dsn1), &gorm.Config{})
 	//	HongbaoDB, err = gorm.Open(mysql.Open(dsn2), &gorm.Config{})

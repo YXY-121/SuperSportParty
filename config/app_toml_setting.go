@@ -30,8 +30,9 @@ type TomlConfig struct {
 	Log      Log      `toml:"Log"`
 }
 type Log struct {
-	LogPath string `toml:"Log"`
+	LogPath string `toml:"LogPath"`
 	Level   string `toml:"Level"`
+	LogFile string `toml:"LogFile"`
 }
 
 var App = TomlConfig{}

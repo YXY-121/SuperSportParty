@@ -17,8 +17,8 @@ func LogToGin() gin.HandlerFunc {
 		//很关键
 		//把读过的字节流重新放到body
 		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(data))
-		//logrus.Printf("requestbody is [%v],requestUrl is [%v],requestHost is [%v],time is [%v]/n",
-		//	c.Request.Body, c.Request.URL, c.Request.Host)
+		logrus.Debugf("requestbody is [%v],requestUrl is [%v],requestHost is [%v],time is [%v]/n",
+			c.Request.Body, c.Request.URL, c.Request.Host)
 	}
 
 }

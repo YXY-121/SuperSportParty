@@ -11,6 +11,7 @@ import (
 	"math/big"
 
 	"github.com/gomodule/redigo/redis"
+	uuid "github.com/satori/go.uuid"
 
 	"time"
 )
@@ -56,10 +57,26 @@ func RangeRand(min, max int64) int64 {
 }
 
 //创建拼单
-func (o *OrderService) CreateOrder(order model.Order) {
+func (o *OrderService) CreateOrder(req model.OrderReq) {
 
 	//拼单成功后
 	//写入数据库
+	order := model.Order{}
+	order.CreateTime = time.Now().Unix()
+	order.OrderId = uuid.NewV1().String()
+	order.Description = req.Description
+	if req.Latitude != nil {
+		order.Latitude = *req.Latitude
+	}
+	if req.Longitude != nil {
+		order.Longitude = *req.Longitude
+	}
+	if req.TotalNumber != nil {
+		order.TotalNumber = *req.TotalNumber
+
+	}
+	order.SportType = req.OrderType
+	order.CreaterId = req.CreaterId
 	o.orderRepository.CreateOrder(order)
 	//	biteOrder, _ := json.Marshal(order)
 
@@ -168,8 +185,4 @@ func (o *OrderService) WatchDog(key string, value string, ctx context.Context) {
 
 func (o *OrderService) GetOrderById(orderId string) model.Order {
 	return o.orderRepository.GetOrderByOrderId(orderId)
-}
-
-func (o *OrderService) GetOrderByTypeAndLocation(orderType string, location string) []model.Order {
-	return o.orderRepository.GetOrderByTypeAndLocation(orderType, location)
 }

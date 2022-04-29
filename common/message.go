@@ -14,10 +14,11 @@ type SingleMessage struct {
 }
 
 type Message struct {
-	GroupId string `json:"group_id"`
-	UserId  string `json:"user_id"`
-	Type    string `json:"type"` //single或者是group，作为
-	Content string `json:"content"`
+	GroupId    string `json:"group_id"`
+	UserId     string `json:"user_id"`
+	Type       string `json:"type"` //single或者是group，作为
+	Content    string `json:"content"`
+	AccepterId string `json:"accepter_id"`
 }
 type CreateGroupMessage struct {
 	GroupName string   `json:"group_name"`

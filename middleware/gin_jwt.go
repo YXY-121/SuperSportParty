@@ -3,7 +3,6 @@ package middleware
 import (
 	"apiproject/config"
 	"apiproject/pkg"
-	"net/http"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -34,7 +33,6 @@ func CreateJwt(userId string) string {
 
 }
 func ParseJwt(token string, c *gin.Context) error {
-	g := pkg.Gin{C: c}
 
 	//有token，解析验证token
 	tokenClaims, err := jwt.ParseWithClaims(token, &MyJwt{}, func(token *jwt.Token) (interface{}, error) {
@@ -47,14 +45,13 @@ func ParseJwt(token string, c *gin.Context) error {
 	}
 
 	logrus.Errorf("parse token fail,err is [%v]\n", err)
-	g.Response(http.StatusBadRequest, pkg.ErrorTokenInvalid, nil)
+	pkg.Response(c, pkg.ErrorTokenInvalid, nil)
 	return err
 
 }
 
 func JwtToGin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		g := pkg.Gin{C: c}
 		token := c.GetHeader(config.App.Server.JwtHeader)
 		//请求login 就放行
 		if c.Request.URL.String() == "/login" {
@@ -65,7 +62,7 @@ func JwtToGin() gin.HandlerFunc {
 		//没有token，非法访问
 		if token == "" {
 			logrus.Errorln("token not exist,please login")
-			g.Response(http.StatusBadRequest, pkg.ErrorTokenNoExist, nil)
+			pkg.Response(c, pkg.ErrorTokenNoExist, nil)
 			c.Abort()
 			return
 		}

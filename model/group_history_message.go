@@ -1,12 +1,10 @@
 package model
 
-import "time"
-
 type GroupHistoryMessage struct {
-	SenderId string    `gorm:"sender_id"`
-	Content  string    `gorm:"content"`
-	GroupId  string    `gorm:"group_id"`
-	Time     time.Time `gorm:"time"`
+	SenderId   string `gorm:"sender_id"`
+	Content    string `gorm:"content"`
+	GroupId    string `gorm:"group_id"`
+	CreateTime int64  `gorm:"create_time"`
 }
 
 func (GroupHistoryMessage) TableName() string {
