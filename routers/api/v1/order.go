@@ -221,8 +221,8 @@ func UploadTencentCloud(filesPath string, name string) string {
 	b := &cos.BaseURL{BucketURL: u}
 	c := cos.NewClient(b, &http.Client{
 		Transport: &cos.AuthorizationTransport{
-			SecretID:  "AKID98tPghTzGH3Zpqb7NO9fvvPedNr53mFS", // 替换为用户的 SecretId，请登录访问管理控制台进行查看和管理，https://console.cloud.tencent.com/cam/capi
-			SecretKey: "0kESRAesra4IH0ThfNq30h9LI0Sfcknd",     // 替换为用户的 SecretKey，请登录访问管理控制台进行查看和管理，https://console.cloud.tencent.com/cam/capi
+			SecretID:  "a", // 替换为用户的 SecretId，请登录访问管理控制台进行查看和管理，https://console.cloud.tencent.com/cam/capi
+			SecretKey: "b", // 替换为用户的 SecretKey，请登录访问管理控制台进行查看和管理，https://console.cloud.tencent.com/cam/capi
 		},
 	})
 
